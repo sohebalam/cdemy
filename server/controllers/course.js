@@ -63,7 +63,7 @@ export const removeImage = async (req, res) => {
     S3.deleteObject(params, (err, data) => {
       if (err) {
         console.log(err)
-        res.sendStatus(400)
+        return res.sendStatus(400)
       }
       res.send({ ok: true })
     })
