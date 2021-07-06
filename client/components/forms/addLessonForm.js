@@ -5,7 +5,7 @@ import { CloseCircleFilled } from "@ant-design/icons"
 const AddLessonForm = ({
   values,
   setValues,
-  handelAddLesson,
+  handleAddLesson,
   uploading,
   uploadButtonText,
   handelVideo,
@@ -14,7 +14,7 @@ const AddLessonForm = ({
 }) => {
   return (
     <div className="container pt-3">
-      <form onSubmit={handelAddLesson}>
+      <form onSubmit={handleAddLesson}>
         <input
           type="text"
           className="form-control square"
@@ -55,7 +55,7 @@ const AddLessonForm = ({
           />
         )}
         <Button
-          onClick={handelAddLesson}
+          onClick={handleAddLesson}
           className="col mt-3"
           size="large"
           type="primary"
