@@ -63,6 +63,24 @@ const CourseView = () => {
       toast("Video Upload Failed")
     }
   }
+  // /${course.instructor._id}
+  const handelVideoRemove = async () => {
+    try {
+      setUploading(true)
+      const { data } = await axios.post(
+        `/api/course/video-remove`,
+        values.video
+      )
+      console.log(data)
+      setValues({ ...values, video: {} })
+      setUploading(false)
+      setUploadButtonText("Upload another video")
+    } catch (err) {
+      console.log(err)
+      setUploading(false)
+      toast("Video remove failed")
+    }
+  }
 
   return (
     <InstructorRoute>
@@ -133,6 +151,7 @@ const CourseView = () => {
                 uploadButtonText={uploadButtonText}
                 handelVideo={handelVideo}
                 progress={progress}
+                handelVideoRemove={handelVideoRemove}
               />
             </Modal>
           </div>

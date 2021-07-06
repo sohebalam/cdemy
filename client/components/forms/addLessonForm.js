@@ -1,17 +1,20 @@
-import { Button, Progress } from "antd"
+import { Button, Progress, Tooltip } from "antd"
+
+import { CloseCircleFilled } from "@ant-design/icons"
 
 const AddLessonForm = ({
   values,
   setValues,
-  handleAddLesson,
+  handelAddLesson,
   uploading,
   uploadButtonText,
   handelVideo,
   progress,
+  handelVideoRemove,
 }) => {
   return (
     <div className="container pt-3">
-      <form onSubmit={handleAddLesson}>
+      <form onSubmit={handelAddLesson}>
         <input
           type="text"
           className="form-control square"
@@ -21,7 +24,6 @@ const AddLessonForm = ({
           autoFocus
           required
         />
-
         <textarea
           className="form-control mt-3"
           cols="7"
@@ -30,12 +32,21 @@ const AddLessonForm = ({
           values={values.content}
           placeholder="Content"
         ></textarea>
+        <div className="d-flex justify-content-center">
+          <label className="btn btn-dark btn-block text-left mt-3">
+            {uploadButtonText}
+            <input onChange={handelVideo} type="file" accept="video/*" hidden />
+          </label>
 
-        <label className="btn btn-dark btn-block text-left mt-3">
-          {uploadButtonText}
-          <input onChange={handelVideo} type="file" accept="video/*" hidden />
-        </label>
-
+          {!uploading && values.video.Location && (
+            <Tooltip title="Remove">
+              <span onClick={handelVideoRemove} className="pt-1 pl-3">
+                <CloseCircleFilled className="text-danger d-flex justify-content-center pt-4 pointer" />
+              </span>
+            </Tooltip>
+          )}
+        </div>
+        ``
         {progress > 0 && (
           <Progress
             className="d-flex justify-content-center pt-2"
@@ -43,9 +54,8 @@ const AddLessonForm = ({
             steps={10}
           />
         )}
-
         <Button
-          onClick={handleAddLesson}
+          onClick={handelAddLesson}
           className="col mt-3"
           size="large"
           type="primary"

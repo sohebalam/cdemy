@@ -13,6 +13,7 @@ import {
   create,
   readCourse,
   uploadVideo,
+  removeVideo,
 } from "../controllers/course"
 
 // image
@@ -21,6 +22,7 @@ router.post("/course/remove-image", removeImage)
 // course
 router.post("/course", requireSignin, isInstructor, create)
 router.post("/course/video-upload", requireSignin, formidable(), uploadVideo)
+router.post("/course/video-remove", requireSignin, removeVideo)
 router.get("/course/:slug", readCourse)
 
 module.exports = router

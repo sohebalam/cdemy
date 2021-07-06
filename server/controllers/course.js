@@ -133,3 +133,27 @@ export const uploadVideo = async (req, res) => {
     console.log(error)
   }
 }
+export const removeVideo = async (req, res) => {
+  try {
+    const { Bucket, Key } = req.body
+
+    // console.log(video)
+    // return
+
+    const params = {
+      Bucket,
+      Key,
+    }
+
+    S3.deleteObject(params, (err, data) => {
+      if (err) {
+        console.log(err)
+        return res.sendStatus(400)
+      }
+      console.log(data)
+      res.send({ ok: true })
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
