@@ -2,6 +2,7 @@ import AWS from "aws-sdk"
 import { nanoid } from "nanoid"
 import Course from "../models/course"
 import slugify from "slugify"
+import { readFileSync } from "fs"
 
 const awsConfig = {
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -101,6 +102,33 @@ export const readCourse = async (req, res) => {
       .populate("instructor", "_id name")
       .exec()
     res.json(course)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const uploadVideo = async (req, res) => {
+  try {
+    const { video } = req.files
+
+    if (!video) res.status(400).json({ message: "No Video" })
+
+    const params = {
+      Bucket: "edemy2-bucket",
+      Key: `${nanoid()}.${video.type.split("/")[1]}`,
+      Body: readFileSync(video.path),
+      ACL: "public-read",
+      ContentType: video.type,
+    }
+
+    S3.upload(params, (err, data) => {
+      if (err) {
+        console.log(err)
+        return res.sendStatus(400)
+      }
+      console.log(data)
+      res.send(data)
+    })
   } catch (error) {
     console.log(error)
   }

@@ -4,11 +4,25 @@ import InstructorRoute from "../../../../components/routes/InstructorRoute"
 import axios from "axios"
 import { Avatar, Tooltip, Button, Modal, List } from "antd"
 import { EditOutlined, CheckOutlined, UploadOutlined } from "@ant-design/icons"
-import { render } from "react-dom"
+
 import ReactMarkdown from "react-markdown"
+import { toast } from "react-toastify"
+
+import AddLessonForm from "../../../../components/forms/addLessonForm"
 
 const CourseView = () => {
   const [course, setCourse] = useState({})
+  const [visible, setVisible] = useState(false)
+  const [values, setValues] = useState({
+    title: "",
+    content: "",
+    video: "",
+  })
+
+  const [uploading, setUploading] = useState(false)
+  const [uploadButtonText, setUploadButtonText] = useState("Upload Video")
+  const [progress, setProgress] = useState()
+
   const router = useRouter()
   const { slug } = router.query
 
@@ -18,6 +32,36 @@ const CourseView = () => {
   const loadCourse = async () => {
     const { data } = await axios.get(`/api/course/${slug}`)
     setCourse(data)
+  }
+
+  const handleAddLesson = (e) => {
+    e.preventDefault()
+    console.log(values)
+  }
+
+  const handelVideo = async (e) => {
+    try {
+      const file = e.target.files[0]
+      setUploadButtonText(file.name)
+      setUploading(true)
+      const videoData = new FormData()
+
+      videoData.append("video", file)
+
+      const { data } = await axios.post("/api/course/video-upload", videoData, {
+        onUploadProgress: (e) =>
+          setProgress(Math.round((100 * e.loaded) / e.total)),
+      })
+
+      console.log(data)
+      setValues({ ...values, video: data })
+      setUploading(false)
+      toast("Video Upload Success")
+    } catch (error) {
+      console.log(error)
+      setUploading(false)
+      toast("Video Upload Failed")
+    }
   }
 
   return (
@@ -61,6 +105,36 @@ const CourseView = () => {
                 <ReactMarkdown>{course.description}</ReactMarkdown>,
               </div>
             </div>
+            <div className="row">
+              <Button
+                className="col-md-6 offset-md-3 text-center"
+                type="primary"
+                shape="round"
+                icon={<UploadOutlined />}
+                size="large"
+                onClick={() => setVisible(true)}
+              >
+                Add Lesson
+              </Button>
+            </div>
+            <br />
+            <Modal
+              title="+ Add Lesson"
+              centered
+              visible={visible}
+              onCancel={() => setVisible(false)}
+              footer={null}
+            >
+              <AddLessonForm
+                values={values}
+                setValues={setValues}
+                handleAddLesson={handleAddLesson}
+                uploading={uploading}
+                uploadButtonText={uploadButtonText}
+                handelVideo={handelVideo}
+                progress={progress}
+              />
+            </Modal>
           </div>
         )}
       </div>
