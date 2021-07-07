@@ -178,7 +178,7 @@ export const addLesson = async (req, res) => {
     }
 
     const updated = await Course.findOneAndUpdate(
-      {},
+      { slug },
       {
         $push: { lessons: { title, content, video, slug: slugify(title) } },
       },
@@ -191,5 +191,27 @@ export const addLesson = async (req, res) => {
   } catch (error) {
     console.log(error)
     return res.status(400).send("add lesson failed")
+  }
+}
+
+export const update = async (req, res) => {
+  try {
+    const { slug } = req.params
+    // console.log(slug)
+    const course = await Course.findOne({ slug }).exec()
+    // console.log("course", course)
+
+    if (req.user._id != course.instructor) {
+      return res.status(400).json({ message: "Unathorized" })
+    }
+
+    const updated = await Course.findOneAndUpdate({ slug }, req.body, {
+      new: true,
+    }).exec()
+
+    res.json(updated)
+  } catch (error) {
+    console.log(error)
+    return res.status(400).send(error.message)
   }
 }
