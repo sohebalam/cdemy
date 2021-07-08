@@ -6,8 +6,9 @@ import Resizer from "react-image-file-resizer"
 import { toast } from "react-toastify"
 import { useRouter } from "next/router"
 import Item from "antd/lib/list/Item"
-import { Avatar, List } from "antd"
+import { Avatar, List, Modal } from "antd"
 import { DeleteOutlined } from "@ant-design/icons"
+import UpdateLessonForm from "../../../../components/forms/UpdateLessonForm"
 
 const CourseEdit = () => {
   const router = useRouter()
@@ -25,6 +26,13 @@ const CourseEdit = () => {
   const [image, setImage] = useState({})
   const [preview, setPreview] = useState("")
   const [uploadButtonText, setUploadButtonText] = useState("Upload Image")
+  const [uploadVideoButtonText, setUploadVideoButtonText] =
+    useState("Upload Video")
+  const [visable, setVisable] = useState(false)
+  const [current, setCurrent] = useState({})
+
+  const [progress, setProgress] = useState(0)
+  const [uploading, setUploading] = useState(false)
 
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value })
@@ -130,6 +138,14 @@ const CourseEdit = () => {
     const { data } = await axios.put(`/api/course/${slug}/${removed[0]._id}`)
     console.log("lessondeleted", data)
   }
+
+  const handelVideo = () => {
+    console.log("handle video")
+  }
+  const handelUpdateLesson = () => {
+    console.log("handle update lesson")
+  }
+
   return (
     <InstructorRoute>
       <h1 className="jumbotron text-center square">Update Course</h1>
@@ -163,6 +179,10 @@ const CourseEdit = () => {
                 onDrop={(e) => handelDrop(e, index)}
               >
                 <Item.Meta
+                  onClick={() => {
+                    setVisable(true)
+                    setCurrent(item)
+                  }}
                   avatar={<Avatar>{index + 1}</Avatar>}
                   title={item.title}
                 ></Item.Meta>
@@ -175,6 +195,23 @@ const CourseEdit = () => {
           ></List>
         </div>
       </div>
+      <Modal
+        title="Update Lesson"
+        centered
+        visible={visable}
+        onCancel={() => setVisable(false)}
+        footer={null}
+      >
+        <UpdateLessonForm
+          current={current}
+          setCurrent={setCurrent}
+          handelVideo={handelVideo}
+          handelUpdateLesson={handelUpdateLesson}
+          uploadVideoButtonText={uploadVideoButtonText}
+          progress={progress}
+          uploading={uploading}
+        />
+      </Modal>
     </InstructorRoute>
   )
 }
