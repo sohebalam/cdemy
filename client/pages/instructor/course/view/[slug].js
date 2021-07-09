@@ -3,7 +3,15 @@ import { useRouter } from "next/router"
 import InstructorRoute from "../../../../components/routes/InstructorRoute"
 import axios from "axios"
 import { Avatar, Tooltip, Button, Modal, List } from "antd"
-import { EditOutlined, CheckOutlined, UploadOutlined } from "@ant-design/icons"
+import {
+  EditOutlined,
+  CheckOutlined,
+  UploadOutlined,
+  QuestionCircleFilled,
+  QuestionOutlined,
+  CloseOutlined,
+  QuestionCircleOutlined,
+} from "@ant-design/icons"
 import Item from "antd/lib/list/Item"
 import ReactMarkdown from "react-markdown"
 import { toast } from "react-toastify"
@@ -103,6 +111,35 @@ const CourseView = () => {
     }
   }
 
+  const handlePublish = async (e, courseId) => {
+    try {
+      let answer = window.confirm(
+        "One you publish your course, it will be live in the marketplace for users to enroll"
+      )
+      if (!answer) return
+
+      const { data } = await axios.put(`/api/course/publish/${courseId}`)
+      toast(" course is live")
+      setCourse(data)
+    } catch (error) {
+      toast("Publish failed, course is not live")
+    }
+  }
+
+  const handleUnpublish = async (e, courseId) => {
+    try {
+      let answer = window.confirm(
+        "One you Un-Publish your course, it will  not be live in the marketplace for users to enroll"
+      )
+      if (!answer) return
+      const { data } = await axios.put(`/api/course/unpublish/${courseId}`)
+      toast(" course is not live")
+      setCourse(data)
+    } catch (error) {
+      toast("UnPublish failed, course is live")
+    }
+  }
+
   return (
     <InstructorRoute>
       <div className="contianer-fluid pt-3">
@@ -127,18 +164,27 @@ const CourseView = () => {
                     </p>
                   </div>
 
-                  <div className="d-flex pt-4">
-                    <Tooltip title="Edit">
-                      <EditOutlined
-                        onClick={() =>
-                          router.push(`/instructor/course/edit/${slug}`)
-                        }
-                        className="h5 pointer text-warning mr-4"
-                      />
-                    </Tooltip>
-                    <Tooltip title="Publish">
-                      <CheckOutlined className="h5 pointer text-danger" />
-                    </Tooltip>
+                  <div>
+                    {course.lessons && course.lessons.length < 5 ? (
+                      <Tooltip title="Min 5 lessons required to publish">
+                        <QuestionOutlined className="h5 pointer text-danger" />
+                      </Tooltip>
+                    ) : course.published ? (
+                      <Tooltip title="Unpublish">
+                        <CloseOutlined
+                          // onClick={handlePublish}
+                          onClick={(e) => handleUnpublish(e, course._id)}
+                          className="h5 pointer text-danger"
+                        />
+                      </Tooltip>
+                    ) : (
+                      <Tooltip title="Publish">
+                        <CheckOutlined
+                          onClick={(e) => handlePublish(e, course._id)}
+                          className="h5 pointer text-success"
+                        />
+                      </Tooltip>
+                    )}
                   </div>
                 </div>
               </div>
