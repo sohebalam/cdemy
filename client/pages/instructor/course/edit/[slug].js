@@ -139,11 +139,52 @@ const CourseEdit = () => {
     console.log("lessondeleted", data)
   }
 
-  const handelVideo = () => {
-    console.log("handle video")
+  const handelVideo = async (e) => {
+    // remove previous
+    if (current.video && current.video.Location) {
+      const res = await axios.post(
+        `/api/course/video-remove/${values.instructor._id}`,
+        current.video
+      )
+    }
+    // upload
+    const file = e.target.files[0]
+    setUploadButtonText(file.name)
+    setUploading(true)
+    // send video as form data
+    const videoData = new FormData()
+    videoData.append("video", file)
+    videoData.append("courseId", values._id)
+    // save progress bar and send video as form data to backend
+    const { data } = await axios.post(
+      `/api/course/video-upload/${values.instructor._id}`,
+      videoData,
+      {
+        onUploadProgress: (e) =>
+          setProgress(Math.round((100 * e.loaded) / e.total)),
+      }
+    )
+    // once response is received
+    setCurrent({ ...current, video: data })
+    setUploading(false)
   }
-  const handelUpdateLesson = () => {
-    console.log("handle update lesson")
+  const handelUpdateLesson = async (e) => {
+    e.preventDefault()
+    const { data } = await axios.put(
+      `/api/course/lesson/${slug}/${current._id}`,
+      current
+    )
+    setUploadVideoButtonText("Upload Video")
+    setVisable(false)
+    toast("Lesson updated")
+    if (data.ok) {
+      let arr = values.lessons
+      const index = arr.findIndex((el) => el._id === current._id)
+      arr[index] = current
+      setValues({ ...values, lessons: arr })
+    }
+
+    // setValues({ ...data })
   }
 
   return (
