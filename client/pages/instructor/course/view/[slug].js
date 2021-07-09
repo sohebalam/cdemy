@@ -52,8 +52,9 @@ const CourseView = () => {
       )
 
       setValues({ ...values, title: "", content: "", video: {} })
-      setVisible(false)
+      setProgress(0)
       setUploadButtonText("Upload video")
+      setVisible(false)
       setCourse(data)
       toast("Lesson added")
     } catch (error) {
@@ -165,6 +166,14 @@ const CourseView = () => {
                   </div>
 
                   <div>
+                    <Tooltip title="Edit">
+                      <EditOutlined
+                        onClick={() =>
+                          router.push(`/instructor/course/edit/${slug}`)
+                        }
+                        className="h5 pointer text-warning mr-4"
+                      />
+                    </Tooltip>
                     {course.lessons && course.lessons.length < 5 ? (
                       <Tooltip title="Min 5 lessons required to publish">
                         <QuestionOutlined className="h5 pointer text-danger" />
