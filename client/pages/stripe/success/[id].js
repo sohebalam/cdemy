@@ -14,8 +14,9 @@ const StripSuccess = () => {
 
   const successRequest = async () => {
     const { data } = await axios.get(`/api/stripe-success/${id}`)
+    console.log("client strip", data)
 
-    router.push(`/user/course/${data.slug}`)
+    router.push(`/user/course/${data.course.slug}`)
   }
 
   return (
