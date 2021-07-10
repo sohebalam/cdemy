@@ -384,7 +384,6 @@ export const paidEnrollment = async (req, res) => {
       success_url: `${process.env.STRIPE_SUCCESS_URL}/${course._id}`,
       cancel_url: process.env.STRIPE_CANCEL_URL,
     })
-    console.log("Session Id", session)
     const userUpdate = await User.findByIdAndUpdate(req.user._id, {
       stripeSession: session,
     }).exec()
@@ -415,5 +414,17 @@ export const stripeSuccess = async (req, res) => {
     res.send(session.id)
   } catch (error) {
     console.log("stipe error", error)
+  }
+}
+
+export const userCourses = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).exec()
+    const courses = await Course.find({ _id: { $in: user.courses } })
+      .populate("instructor", "_id name")
+      .exec()
+    res.json(courses)
+  } catch (error) {
+    console.log(error)
   }
 }
