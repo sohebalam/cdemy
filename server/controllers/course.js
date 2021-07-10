@@ -3,7 +3,7 @@ import { nanoid } from "nanoid"
 import Course from "../models/course"
 import slugify from "slugify"
 import { readFileSync } from "fs"
-
+import User from "../models/user"
 const awsConfig = {
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -313,4 +313,44 @@ export const courses = async (req, res) => {
       .exec()
     res.json(all)
   } catch (error) {}
+}
+
+export const checkEnrollment = async (req, res) => {
+  try {
+    const { courseId } = req.params
+
+    const user = await User.findById(req.user._id).exec()
+
+    let ids = []
+    let length = user.courses && user.courses.length
+
+    for (let i = 0; i < length; i++) {
+      ids.push(user.courses[i].toString())
+    }
+
+    res.json({
+      status: ids.includes(courseId),
+      course: await Course.findById(courseId).exec(),
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const freeEnrollment = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.courseId).exec()
+    if (course.paid) return
+    const result = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $addToSet: { courses: course._id },
+      },
+      { new: true }
+    ).exec()
+    res.json({ message: "You have enrolled", course: course })
+  } catch (error) {
+    console.log(error)
+    return res.status(400).send("Enrollment create failed")
+  }
 }

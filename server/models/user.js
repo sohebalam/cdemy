@@ -1,5 +1,6 @@
-import mongoose from "mongoose";
-const { Schema } = mongoose;
+import mongoose from "mongoose"
+const { Schema } = mongoose
+const { ObjectId } = Schema
 
 const userSchema = new Schema(
   {
@@ -36,8 +37,9 @@ const userSchema = new Schema(
       data: String,
       default: "",
     },
+    courses: [{ type: ObjectId, ref: "Course" }],
   },
   { timestamps: true }
-);
+)
 
-export default mongoose.model("User", userSchema);
+export default mongoose.model("User", userSchema)

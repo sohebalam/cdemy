@@ -1,15 +1,21 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { currencyFormatter } from "../../utils/helpers"
-import { Badge, Modal } from "antd"
+import { Badge, Button } from "antd"
 import ReactPlayer from "react-player"
-
+import { LoadingOutlined, SafetyOutlined } from "@ant-design/icons"
 const SingleCourseJumbotron = ({
   course,
   showModal,
   setShowModal,
   setPreview,
   preview,
+  loading,
+  user,
+  handelPaidEnroll,
+  handelFreeEnroll,
+  enrolled,
+  setEnrolled,
 }) => {
   const {
     name,
@@ -57,7 +63,7 @@ const SingleCourseJumbotron = ({
                   url={lessons[0].video.Location}
                   light={image.Location}
                   width="100%"
-                  width="225px"
+                  height="225px"
                 />
               </div>
             ) : (
@@ -68,6 +74,28 @@ const SingleCourseJumbotron = ({
                   className="img img-fluid"
                 />
               </div>
+            )}
+            {loading ? (
+              <div className="d-flex justify-contect-center">
+                <LoadingOutlined className="h1 text-danger" />
+              </div>
+            ) : (
+              <Button
+                className="mb-3 mt-2"
+                type="danger"
+                block
+                shape="round"
+                icon={<SafetyOutlined />}
+                size="large"
+                disabled={loading}
+                onClick={paid ? handelPaidEnroll : handelFreeEnroll}
+              >
+                {user
+                  ? enrolled.status
+                    ? "Go to course"
+                    : "Enroll"
+                  : "Login to Enroll"}
+              </Button>
             )}
           </div>
         </div>

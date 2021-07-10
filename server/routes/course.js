@@ -21,6 +21,8 @@ import {
   unpublishCourse,
   publishCourse,
   courses,
+  checkEnrollment,
+  freeEnrollment,
 } from "../controllers/course"
 
 router.get("/courses", courses)
@@ -45,5 +47,8 @@ router.get("/course/:slug", readCourse)
 router.post("/course/lesson/:slug/:instructorId", requireSignin, addLesson)
 router.put("/course/lesson/:slug/:instructorId", requireSignin, updateLesson)
 router.put("/course/:slug/:lessonId", requireSignin, removeLesson)
+router.get("/check-enrollment/:courseId", requireSignin, checkEnrollment)
+
+router.post("/free-enrollment/:courseId", requireSignin, freeEnrollment)
 
 module.exports = router
