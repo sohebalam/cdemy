@@ -464,27 +464,31 @@ export const markCompleted = async (req, res) => {
 
 export const listCompleted = async (req, res) => {
   try {
-    const { courseId, lessonId } = req.body
-    const updated = await Completed.findOneAndUpdate(
-      {
-        user: req.user._id,
-        course: courseId,
-      },
-      { $pull: { lessons: lessonId } }
-    ).exec()
-    res.json({ ok: true })
-  } catch (error) {
-    console.log(error)
+    const list = await Completed.findOne({
+      user: req.user._id,
+      course: req.body.courseId,
+    }).exec()
+    list && res.json(list.lessons)
+  } catch (err) {
+    console.log(err)
   }
 }
 
 export const listIncomplete = async (req, res) => {
   try {
-    const list = await Completed.findOne({
-      user: req.user._id,
-      course: req.body.courseId,
-    }).exec()
-  } catch (error) {
-    console.log(error)
+    const { courseId, lessonId } = req.body
+
+    const updated = await Completed.findOneAndUpdate(
+      {
+        user: req.user._id,
+        course: courseId,
+      },
+      {
+        $pull: { lessons: lessonId },
+      }
+    ).exec()
+    res.json({ ok: true })
+  } catch (err) {
+    console.log(err)
   }
 }

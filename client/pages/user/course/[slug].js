@@ -45,7 +45,6 @@ const SingleCourse = () => {
     const { data } = await axios.post(`/api/list-completed`, {
       courseId: course._id,
     })
-    console.log("COMPLETED LESSONS => ", data)
     setCompletedLessons(data)
   }
 
@@ -102,7 +101,7 @@ const SingleCourse = () => {
                 icon={<Avatar>{index + 1}</Avatar>}
               >
                 {lesson.title.substring(0, 30)}{" "}
-                {/* {completedLessons && completedLessons.includes(lesson._id) ? (
+                {completedLessons && completedLessons.includes(lesson._id) ? (
                   <CheckCircleFilled
                     className="float-right text-primary ml-2"
                     style={{ marginTop: "13px" }}
@@ -112,7 +111,7 @@ const SingleCourse = () => {
                     className="float-right text-danger ml-2"
                     style={{ marginTop: "13px" }}
                   />
-                )} */}
+                )}
               </Item>
             ))}
           </Menu>
@@ -123,7 +122,7 @@ const SingleCourse = () => {
             <>
               <div className="col alert alert-primary square">
                 <b>{course.lessons[clicked].title.substring(0, 30)}</b>
-                {/* {completedLessons &&
+                {completedLessons &&
                 completedLessons.includes(course.lessons[clicked]._id) ? (
                   <span
                     className="float-right pointer"
@@ -135,7 +134,7 @@ const SingleCourse = () => {
                   <span className="float-right pointer" onClick={markCompleted}>
                     Mark as completed
                   </span>
-                )} */}
+                )}
               </div>
 
               {course.lessons[clicked].video &&
