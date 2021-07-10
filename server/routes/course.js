@@ -26,6 +26,9 @@ import {
   paidEnrollment,
   stripeSuccess,
   userCourses,
+  markCompleted,
+  listCompleted,
+  listIncomplete,
 } from "../controllers/course"
 
 router.get("/courses", courses)
@@ -59,5 +62,9 @@ router.post("/paid-enrollment/:courseId", requireSignin, paidEnrollment)
 router.get("/stripe-success/:courseId", requireSignin, stripeSuccess)
 
 router.get("/user/course/:slug", requireSignin, isEnrolled, readCourse)
+
+router.post("/mark-completed", requireSignin, markCompleted)
+router.post("/list-completed", requireSignin, listCompleted)
+router.post("/mark-incomplete", requireSignin, listIncomplete)
 
 module.exports = router

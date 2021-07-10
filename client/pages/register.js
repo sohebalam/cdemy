@@ -1,49 +1,49 @@
-import { useState, useEffect, useContext } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { SyncOutlined } from "@ant-design/icons";
-import Link from "next/link";
-import { Context } from "../context";
-import { useRouter } from "next/router";
-import user from "../../server/models/user";
+import { useState, useEffect, useContext } from "react"
+import axios from "axios"
+import { toast } from "react-toastify"
+import { SyncOutlined } from "@ant-design/icons"
+import Link from "next/link"
+import { Context } from "../context"
+import { useRouter } from "next/router"
+import user from "../../server/models/user"
 
 const Register = () => {
-  const [name, setName] = useState("Ryan");
-  const [email, setEmail] = useState("ryan@gmail.com");
-  const [password, setPassword] = useState("rrrrrr");
-  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState("Ryan")
+  const [email, setEmail] = useState("ryan@gmail.com")
+  const [password, setPassword] = useState("rrrrrr")
+  const [loading, setLoading] = useState(false)
 
   const {
     state: { user },
-  } = useContext(Context);
+  } = useContext(Context)
 
-  const router = useRouter();
+  const router = useRouter()
 
   useEffect(() => {
-    if (user !== null) router.push("/");
-  }, [user]);
+    if (user !== null) router.push("/")
+  }, [user])
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     // console.table({ name, email, password });
     try {
-      setLoading(true);
+      setLoading(true)
       const { data } = await axios.post(`/api/register`, {
         name,
         email,
         password,
-      });
+      })
       // console.log("REGISTER RESPONSE", data);
-      toast("Registration successful. Please login.");
-      setName("");
-      setEmail("");
-      setPassword("");
-      setLoading(false);
+      toast("Registration successful. Please login.")
+      setName("")
+      setEmail("")
+      setPassword("")
+      setLoading(false)
     } catch (err) {
-      toast(err.response.data);
-      setLoading(false);
+      toast(err.response.data)
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <>
@@ -95,7 +95,7 @@ const Register = () => {
         </p>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Register;
+export default Register

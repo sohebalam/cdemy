@@ -4,6 +4,7 @@ import Course from "../models/course"
 import slugify from "slugify"
 import { readFileSync } from "fs"
 import User from "../models/user"
+import Completed from "../models/completed"
 const stripe = require("stripe")(process.env.STRIPE_SECRET)
 
 const awsConfig = {
@@ -424,6 +425,65 @@ export const userCourses = async (req, res) => {
       .populate("instructor", "_id name")
       .exec()
     res.json(courses)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const markCompleted = async (req, res) => {
+  const { courseId, lessonId } = req.body
+  // console.log(courseId, lessonId);
+  // find if user with that course is already created
+  const existing = await Completed.findOne({
+    user: req.user._id,
+    course: courseId,
+  }).exec()
+
+  if (existing) {
+    // update
+    const updated = await Completed.findOneAndUpdate(
+      {
+        user: req.user._id,
+        course: courseId,
+      },
+      {
+        $addToSet: { lessons: lessonId },
+      }
+    ).exec()
+    res.json({ ok: true })
+  } else {
+    // create
+    const created = await new Completed({
+      user: req.user._id,
+      course: courseId,
+      lessons: lessonId,
+    }).save()
+    res.json({ ok: true })
+  }
+}
+
+export const listCompleted = async (req, res) => {
+  try {
+    const { courseId, lessonId } = req.body
+    const updated = await Completed.findOneAndUpdate(
+      {
+        user: req.user._id,
+        course: courseId,
+      },
+      { $pull: { lessons: lessonId } }
+    ).exec()
+    res.json({ ok: true })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const listIncomplete = async (req, res) => {
+  try {
+    const list = await Completed.findOne({
+      user: req.user._id,
+      course: req.body.courseId,
+    }).exec()
   } catch (error) {
     console.log(error)
   }
