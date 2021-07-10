@@ -4,6 +4,8 @@ import Course from "../models/course"
 import slugify from "slugify"
 import { readFileSync } from "fs"
 import User from "../models/user"
+const stripe = require("stripe")(process.env.STRIPE_SECRET)
+
 const awsConfig = {
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -352,5 +354,50 @@ export const freeEnrollment = async (req, res) => {
   } catch (error) {
     console.log(error)
     return res.status(400).send("Enrollment create failed")
+  }
+}
+
+export const paidEnrollment = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.courseId)
+      .populate("instructor")
+      .exec()
+    if (!course.paid) return
+    const fee = (course.price * 30) / 100
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          name: course.name,
+          amount: Math.round(course.price.toFixed(2) * 100),
+          currency: "gbp",
+          quantity: 1,
+        },
+      ],
+      payment_intent_data: {
+        application_fee_amount: Math.round(course.price.toFixed(2) * 100),
+        transfer_data: {
+          destination: course.instructor.stripe_account_id,
+        },
+      },
+      success_url: `${process.env.STRIPE_SUCCESS_URL}/${course._id}`,
+      cancel_url: process.env.STRIPE_CANCEL_URL,
+    })
+    console.log("Session Id", session)
+    const userUpdate = await User.findByIdAndUpdate(req.user._id, {
+      stripeSession: session,
+    }).exec()
+    res.send(session.id)
+  } catch (error) {
+    console.log("Handle Payment", error)
+    return res.status(400).send("Enrollment create falied")
+  }
+}
+
+export const stripeSuccess = async (req, res) => {
+  try {
+  } catch (error) {
+    console.log("stipe error", error)
   }
 }

@@ -6,6 +6,7 @@ import SingleCourseLesson from "../../components/cards/SingleCourseLesson"
 import { useRouter } from "next/router"
 import { Context } from "../../context"
 import { toast } from "react-toastify"
+import { loadStripe } from "@stripe/stripe-js"
 const Course = ({ course }) => {
   const [showModal, setShowModal] = useState(false)
   const [preview, setPreview] = useState("")
@@ -18,8 +19,23 @@ const Course = ({ course }) => {
     state: { user },
   } = useContext(Context)
 
-  const handelPaidEnroll = () => {
-    console.log("handel paid")
+  const handelPaidEnroll = async () => {
+    try {
+      setLoading(true)
+      if (!user) {
+        router.push("/login")
+      }
+      if (enrolled.status) {
+        return router.push(`/user/course/${enrolled.course.slug}`)
+      }
+      const { data } = await axios.post(`/api/paid-enrollment/${course._id}`)
+      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY)
+      stripe.redirectToCheckout({ sessionId: data })
+    } catch (error) {
+      toast("Enrollment failed please try again")
+      console.log(error)
+      setLoading(false)
+    }
   }
   const handelFreeEnroll = async (e) => {
     e.preventDefault()
